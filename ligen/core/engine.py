@@ -14,18 +14,31 @@ import swisseph as swe
 # ── Constantes ────────────────────────────────────────────────────────────────
 
 PLANETS: dict[str, int] = {
-    "Soleil":    swe.SUN,
-    "Lune":      swe.MOON,
-    "Mercure":   swe.MERCURY,
-    "Vénus":     swe.VENUS,
-    "Mars":      swe.MARS,
-    "Jupiter":   swe.JUPITER,
-    "Saturne":   swe.SATURN,
-    "Uranus":    swe.URANUS,
-    "Neptune":   swe.NEPTUNE,
-    "Pluton":    swe.PLUTO,
-    "Nœud Nord": swe.TRUE_NODE,
-    "Chiron":    swe.CHIRON,
+    "Soleil":     swe.SUN,
+    "Lune":       swe.MOON,
+    "Mercure":    swe.MERCURY,
+    "Vénus":      swe.VENUS,
+    "Mars":       swe.MARS,
+    "Jupiter":    swe.JUPITER,
+    "Saturne":    swe.SATURN,
+    "Uranus":     swe.URANUS,
+    "Neptune":    swe.NEPTUNE,
+    "Pluton":     swe.PLUTO,
+    "Nœud Nord":  swe.TRUE_NODE,
+    "Chiron":     swe.CHIRON,
+    "Lilith Moy": swe.MEAN_APOG,
+    # Astéroïdes principaux — nécessitent seas_18.se1 dans ephe_path
+    "Cérès":      swe.CERES,
+    "Pallas":     swe.PALLAS,
+    "Junon":      swe.JUNO,
+    "Vesta":      swe.VESTA,
+    "Pholus":     swe.PHOLUS,
+    # Astéroïdes numérotés — nécessitent fichiers se00NNNs.se1
+    "Éros":       swe.AST_OFFSET + 433,
+    "Psyché":     swe.AST_OFFSET + 16,
+    "Amor":       swe.AST_OFFSET + 1221,
+    "Karma":      swe.AST_OFFSET + 3811,
+    "Nessus":     swe.AST_OFFSET + 7066,
 }
 
 SIGNS: list[str] = [
@@ -201,6 +214,10 @@ def compute_natal_chart(
     # ── Swiss Ephemeris setup ─────────────────────────────────────────────────
     if ephe_path:
         swe.set_ephe_path(ephe_path)
+    # Chemin par défaut si variable d'environnement SE_EPHE_PATH définie
+    import os
+    if not ephe_path and os.environ.get("SE_EPHE_PATH"):
+        swe.set_ephe_path(os.environ["SE_EPHE_PATH"])
 
     swe.set_topo(lon, lat, alt)          # correction topocentrique activée
     flag = swe.FLG_SWIEPH | swe.FLG_SPEED
@@ -214,8 +231,9 @@ def compute_natal_chart(
     except Exception as exc:
         raise RuntimeError(f"Erreur calcul maisons : {exc}") from exc
 
-    # cusps_raw : tuple de 13 valeurs, index 1–12 = cuspides M1–M12
-    cusp_lons = list(cusps_raw[1:13])    # 12 longitudes de cuspides
+    # cusps_raw : tuple de 12 valeurs, index 0–11 = cuspides M1–M12
+    # (convention pyswisseph Campanus/Placidus : cusps[0] = M1 = ASC)
+    cusp_lons = list(cusps_raw[0:12])    # 12 longitudes de cuspides
 
     houses_out: list[HouseCusp] = []
     for i, clon in enumerate(cusp_lons, start=1):
@@ -236,7 +254,10 @@ def compute_natal_chart(
         try:
             result, ret_flag = swe.calc_ut(jd, pid, flag)
         except Exception as exc:
-            raise RuntimeError(f"Erreur calcul {pname} : {exc}") from exc
+            # Astéroïdes numérotés : fichier .se1 manquant → warning non bloquant
+            import warnings
+            warnings.warn(f"Corps {pname} ignoré : {exc}")
+            continue
 
         plon   = result[0]
         speed  = result[3]
