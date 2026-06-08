@@ -1,4 +1,4 @@
-# Ligen — Roadmap
+# Ligen Astralogie — Roadmap
 
 **Ancienne référence :** AstroFlow Roadmap  
 **Dernière mise à jour :** 01.06.2026

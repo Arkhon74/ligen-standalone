@@ -1,5 +1,6 @@
-# Ligen — Documentation Canonique V4
+# Ligen Astralogie — Documentation Canonique V4
 
+**Nom canonique complet :** Ligen Astralogie (forme courte : Ligen)  
 **Statut :** source unique de vérité  
 **Ancienne référence :** AstroFlow Canon V4  
 **Date :** 01.06.2026

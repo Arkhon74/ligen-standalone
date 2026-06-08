@@ -1,7 +1,8 @@
-# Ligen
+# Ligen Astralogie
 
 > Astrologie de la lignée — application standalone
 
+**Nom court :** Ligen  
 **Ancien nom :** AstroFlow Pro (historique uniquement)  
 **Date de renommage :** 01.06.2026  
 **Statut :** développement actif
@@ -10,7 +11,7 @@
 
 ## Positionnement
 
-Ligen est une application astrologique standalone orientée **lecture multi-générationnelle et cartographie de la lignée familiale**. Elle n'est pas une app de thème natal générique. Son différenciateur central est l'analyse systémique des patterns transmis de génération en génération.
+Ligen Astralogie est une application astrologique standalone orientée **lecture multi-générationnelle et cartographie de la lignée familiale**. Elle n'est pas une app de thème natal générique. Son différenciateur central est l'analyse systémique des patterns transmis de génération en génération.
 
 ---
 

@@ -1,7 +1,7 @@
 # Historique — AstroFlow Pro
 
 > Ce fichier est une référence historique uniquement.  
-> Le produit s'appelle désormais **Ligen**.
+> Le produit s'appelle désormais **Ligen Astralogie** (forme courte : **Ligen**).
 
 ---
 

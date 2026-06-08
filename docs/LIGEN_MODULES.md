@@ -1,4 +1,4 @@
-# Ligen — Modules
+# Ligen Astralogie — Modules
 
 **Ancienne référence :** AstroFlow Modules  
 **Date :** 01.06.2026
