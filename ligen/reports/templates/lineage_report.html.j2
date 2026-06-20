@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>{{ title }}</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page {
+  size: A4;
+  margin: 20mm 16mm 20mm 20mm;
+  @bottom-center {
+    content: "Ligen · " counter(page) " / " counter(pages);
+    font-family: 'Georgia', serif;
+    font-size: 8pt; color: #888;
+  }
+}
+@page :first { @bottom-center { content: none; } }
+
+body { font-family: 'Georgia', serif; font-size: 10pt; line-height: 1.6; color: #1a1a2e; }
+h1   { font-size: 20pt; font-weight: bold; }
+h2   { font-size: 13pt; font-weight: bold; margin-top: 1.2em; margin-bottom: 0.4em; }
+h3   { font-size: 11pt; font-weight: bold; margin-top: 0.9em; margin-bottom: 0.3em; }
+p    { margin-bottom: 0.6em; }
+ul   { margin-left: 1.2em; margin-bottom: 0.6em; }
+li   { margin-bottom: 0.2em; }
+
+:root {
+  --gold:    #b8922a;
+  --gold-lt: #d4a83a;
+  --dark:    #0d0d1a;
+  --mid:     #2a2a4a;
+  --light:   #f5f3ee;
+  --border:  #d0cbb8;
+  --green:   #3a7a30;
+  --red:     #8a2020;
+  --blue:    #2a5fa8;
+}
+
+/* ── Cover ─────────────────────────────────────────────────────────────── */
+.cover {
+  page-break-after: always;
+  min-height: 240mm;
+  background: var(--dark);
+  color: #f0ede6;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center; padding: 40pt 30pt;
+  border-radius: 4px;
+}
+.cover-brand  { font-size: 10pt; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-lt); margin-bottom: 20pt; }
+.cover-title  { font-size: 22pt; font-weight: bold; margin-bottom: 6pt; }
+.cover-sub    { font-size: 13pt; color: var(--gold); margin-bottom: 24pt; }
+.cover-div    { width: 50pt; height: 1pt; background: var(--gold); margin: 12pt auto; }
+.cover-meta   { font-size: 9.5pt; color: #aaa; line-height: 2; }
+.cover-meta strong { color: #ddd; }
+.cover-footer { margin-top: 28pt; font-size: 8pt; color: #555; letter-spacing: 0.06em; }
+
+/* ── Part headers ───────────────────────────────────────────────────────── */
+.part-header {
+  border-bottom: 1.5pt solid var(--gold);
+  margin-bottom: 14pt; padding-bottom: 5pt;
+  page-break-before: always;
+  page-break-after: avoid;
+}
+.part-header:first-of-type { page-break-before: avoid; }
+.part-header h2 { font-size: 15pt; color: var(--mid); margin-top: 0; }
+
+/* ── Member cards ───────────────────────────────────────────────────────── */
+.member-grid { display: flex; gap: 12pt; flex-wrap: wrap; margin-bottom: 16pt; }
+.member-card {
+  flex: 1; min-width: 160pt;
+  border: 1pt solid var(--border);
+  border-radius: 4px; padding: 10pt;
+  background: var(--light);
+  page-break-inside: avoid;
+}
+.member-card .role {
+  font-size: 8pt; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 4pt;
+}
+.member-card .mname { font-size: 12pt; font-weight: bold; color: var(--mid); }
+.member-card .mdata { font-size: 9pt; color: #555; margin-top: 4pt; }
+
+/* ── Roues ──────────────────────────────────────────────────────────────── */
+.wheels-row {
+  display: flex; gap: 10pt; justify-content: center;
+  flex-wrap: wrap; margin: 12pt 0 20pt 0;
+  page-break-inside: avoid;
+}
+.wheel-block { text-align: center; }
+.wheel-block img { width: 220pt; height: 220pt; border-radius: 3px; }
+.wheel-cap { font-size: 8pt; color: #888; margin-top: 4pt; font-style: italic; }
+
+/* ── Tableaux ───────────────────────────────────────────────────────────── */
+table { width: 100%; border-collapse: collapse; margin: 8pt 0 12pt 0; font-size: 9pt; page-break-inside: avoid; }
+thead tr { background: var(--mid); color: #f0ede6; }
+thead th  { padding: 4pt 7pt; text-align: left; font-size: 8.5pt; letter-spacing: 0.04em; }
+tbody tr:nth-child(even) { background: var(--light); }
+tbody td  { padding: 3.5pt 7pt; border-bottom: 0.5pt solid var(--border); }
+
+/* ── Indicateurs éléments ───────────────────────────────────────────────── */
+.elem-bar { height: 8pt; border-radius: 2pt; display: inline-block; }
+.elem-fire  { background: #d9522a; }
+.elem-earth { background: #5a8a3a; }
+.elem-air   { background: #3a7ab0; }
+.elem-water { background: #6a4aaa; }
+
+/* ── Sections paires ────────────────────────────────────────────────────── */
+.pair-section {
+  margin-bottom: 20pt;
+  page-break-inside: avoid;
+  border-left: 3pt solid var(--gold);
+  padding-left: 10pt;
+}
+.pair-header {
+  background: var(--mid); color: #f0ede6;
+  padding: 5pt 10pt; border-radius: 0 3px 3px 0;
+  margin-bottom: 8pt; margin-left: -10pt;
+}
+.pair-header .pair-key { font-size: 8pt; color: var(--gold-lt); letter-spacing: 0.1em; font-family: monospace; }
+.pair-header h3 { font-size: 11pt; margin: 2pt 0 0 0; color: #f0ede6; }
+.pair-synth  { font-style: italic; color: #333; margin-bottom: 8pt; font-size: 9.5pt; }
+.pair-col    { margin-bottom: 6pt; }
+.pair-col h4 { font-size: 9.5pt; font-weight: bold; margin-bottom: 3pt; }
+.asp-res { color: var(--green); }
+.asp-ten { color: var(--red); }
+.asp-kar { color: var(--blue); }
+
+/* ── Synthèse globale ───────────────────────────────────────────────────── */
+.summary-block {
+  background: var(--light);
+  border-left: 3pt solid var(--gold);
+  padding: 12pt 14pt;
+  margin: 12pt 0;
+  border-radius: 0 4px 4px 0;
+  white-space: pre-wrap;
+  font-size: 9.5pt;
+  font-family: 'Georgia', serif;
+}
+
+/* ── Stelliums ──────────────────────────────────────────────────────────── */
+.stellium-badge {
+  display: inline-block; background: var(--mid); color: var(--gold-lt);
+  padding: 2pt 6pt; border-radius: 10pt; font-size: 8pt;
+  margin: 2pt; letter-spacing: 0.05em;
+}
+
+/* ── Patterns ───────────────────────────────────────────────────────────── */
+.pattern-item { padding: 3pt 0; border-bottom: 0.5pt solid var(--border); font-size: 9pt; }
+.pattern-item .pcount { color: var(--gold); font-weight: bold; }
+
+/* ── Footer ─────────────────────────────────────────────────────────────── */
+.report-footer {
+  margin-top: 24pt; padding-top: 6pt;
+  border-top: 0.5pt solid var(--border);
+  font-size: 8pt; color: #999; text-align: center;
+}
+</style>
+</head>
+<body>
+
+{# ── COVER ──────────────────────────────────────────────────────────────── #}
+<div class="cover">
+  <div class="cover-brand">Ligen Astralogie</div>
+  <div class="cover-title">{{ title }}</div>
+  <div class="cover-sub">Analyse Transgénérationnelle</div>
+  <div class="cover-div"></div>
+  <div class="cover-meta">
+    <strong>Membres :</strong><br/>
+    {% for m in members %}
+      {{ m.chart.name }} ({{ m.role }}){% if not loop.last %} · {% endif %}
+    {% endfor %}
+    <br/><br/>
+    <strong>Domification :</strong> Campanus · Tropicale<br/>
+    <strong>Protocole :</strong> ASTRO-SCRIPTEUR v3.0
+  </div>
+  <div class="cover-div"></div>
+  <div class="cover-footer">
+    Généré le {{ generated_at }} · Ligen Astralogie · Swiss Ephemeris
+  </div>
+</div>
+
+{# ── MEMBRES ────────────────────────────────────────────────────────────── #}
+<div class="part-header"><h2>Membres de la lignée</h2></div>
+
+<div class="member-grid">
+  {% for row in member_table %}
+  <div class="member-card">
+    <div class="role">{{ row.role }}</div>
+    <div class="mname">{{ row.name }}</div>
+    <div class="mdata">
+      ☉ {{ row.soleil }}<br/>
+      ☽ {{ row.lune }}<br/>
+      ASC {{ row.asc }}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{# ── ROUES INDIVIDUELLES ────────────────────────────────────────────────── #}
+{% if wheels %}
+<h3>Thèmes natals</h3>
+<div class="wheels-row">
+  {% for m in members %}
+  {% if m.chart.name in wheels %}
+  <div class="wheel-block">
+    <img src="{{ wheels[m.chart.name] }}" alt="Roue {{ m.chart.name }}"/>
+    <div class="wheel-cap">{{ m.chart.name }} · {{ m.role }} · Campanus</div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endif %}
+
+{# ── PROFIL ÉLÉMENTAIRE GLOBAL ──────────────────────────────────────────── #}
+<div class="part-header"><h2>Profil élémentaire et modal du système</h2></div>
+
+<table>
+  <thead><tr><th>Élément</th><th>Score</th><th>Statut</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>🔥 Feu</strong></td>
+      <td>{{ report.element_profile.fire }}%</td>
+      <td>{% if report.element_profile.dominant == "Feu" %}<strong>Dominant</strong>{% elif report.element_profile.deficient == "Feu" %}⚠ Carence{% else %}Présent{% endif %}</td>
+    </tr>
+    <tr>
+      <td><strong>🌿 Terre</strong></td>
+      <td>{{ report.element_profile.earth }}%</td>
+      <td>{% if report.element_profile.dominant == "Terre" %}<strong>Dominant</strong>{% elif report.element_profile.deficient == "Terre" %}⚠ Carence{% else %}Présent{% endif %}</td>
+    </tr>
+    <tr>
+      <td><strong>🌬 Air</strong></td>
+      <td>{{ report.element_profile.air }}%</td>
+      <td>{% if report.element_profile.dominant == "Air" %}<strong>Dominant</strong>{% elif report.element_profile.deficient == "Air" %}⚠ Carence{% else %}Présent{% endif %}</td>
+    </tr>
+    <tr>
+      <td><strong>🌊 Eau</strong></td>
+      <td>{{ report.element_profile.water }}%</td>
+      <td>{% if report.element_profile.dominant == "Eau" %}<strong>Dominant</strong>{% elif report.element_profile.deficient == "Eau" %}⚠ Carence{% else %}Présent{% endif %}</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead><tr><th>Modalité</th><th>Score</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Cardinal</strong></td><td>{{ report.modal_profile.cardinal }}%</td></tr>
+    <tr><td><strong>Fixe</strong></td><td>{{ report.modal_profile.fixed }}%</td></tr>
+    <tr><td><strong>Mutable</strong></td><td>{{ report.modal_profile.mutable }}%</td></tr>
+  </tbody>
+</table>
+
+{# ── STELLIUMS DE LIGNÉE ────────────────────────────────────────────────── #}
+{% if report.stelliums %}
+<h3>Stelliums de lignée</h3>
+<p>
+{% for s in report.stelliums %}
+  <span class="stellium-badge">{{ s.sign }} ({{ s.count }})</span>
+{% endfor %}
+</p>
+<table>
+  <thead><tr><th>Signe</th><th>Planètes</th><th>Membres</th></tr></thead>
+  <tbody>
+  {% for s in report.stelliums[:5] %}
+  <tr>
+    <td><strong>{{ s.sign }}</strong></td>
+    <td>{% for e in s.planets %}{{ e[1] }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+    <td>{% set mnames = s.planets | map(attribute=0) | unique | list %}{{ mnames | join(', ') }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{# ── PATTERNS RÉPÉTÉS ───────────────────────────────────────────────────── #}
+{% if report.repeated_patterns %}
+<div class="part-header"><h2>Patterns répétés de lignée</h2></div>
+{% for p in report.repeated_patterns[:8] %}
+<div class="pattern-item">
+  <span class="pcount">× {{ p.count }}</span> —
+  <strong>{{ p.planet }}</strong> en <strong>{{ p.aspect_type }}</strong>
+  dans : {{ p.pairs | join(' · ') }}
+</div>
+{% endfor %}
+{% endif %}
+
+{# ── RÉSONANCES NODALES ─────────────────────────────────────────────────── #}
+{% if report.nodal_resonances %}
+<div class="part-header"><h2>Résonances nodales (liens karmiques)</h2></div>
+<table>
+  <thead>
+    <tr><th>Planète / Membre</th><th>Aspect</th><th>Nœud</th><th>Membre</th><th>Orbe</th></tr>
+  </thead>
+  <tbody>
+  {% for nr in report.nodal_resonances[:12] %}
+  <tr>
+    <td>{{ nr.planet }} ({{ nr.member_planet }})</td>
+    <td>{{ nr.aspect }}</td>
+    <td>{{ nr.node_type }}</td>
+    <td>{{ nr.member_node }}</td>
+    <td>{{ "%.2f"|format(nr.orb) }}°</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{# ── SYNASTRIES PAR PAIRE ───────────────────────────────────────────────── #}
+<div class="part-header"><h2>Synastries par paire</h2></div>
+
+{% for pair_key, ps in pair_sections.items() %}
+<div class="pair-section">
+  <div class="pair-header">
+    <div class="pair-key">{{ pair_key }}</div>
+    <h3>{{ ps.member_a }} ↔ {{ ps.member_b }} — {{ ps.aspect_count }} aspects</h3>
+  </div>
+
+  <p class="pair-synth">{{ ps.synthesis }}</p>
+
+  {% if ps.resources %}
+  <div class="pair-col">
+    <h4 class="asp-res">Ressources</h4>
+    <ul>{% for r in ps.resources %}<li class="asp-res">{{ r }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  {% if ps.tensions %}
+  <div class="pair-col">
+    <h4 class="asp-ten">Tensions</h4>
+    <ul>{% for t in ps.tensions %}<li class="asp-ten">{{ t }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  {% if ps.karmic_links %}
+  <div class="pair-col">
+    <h4 class="asp-kar">Liens karmiques (Nœuds)</h4>
+    <ul>{% for k in ps.karmic_links %}<li class="asp-kar">{{ k }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  {% if ps.themes %}
+  <p><strong>Thèmes communs :</strong> {{ ps.themes | join(' · ') }}</p>
+  {% endif %}
+</div>
+{% endfor %}
+
+{# ── TENSIONS SYSTÉMIQUES ───────────────────────────────────────────────── #}
+{% if report.systemic_tensions %}
+<div class="part-header"><h2>Tensions systémiques</h2></div>
+<table>
+  <thead><tr><th>Type</th><th>Axe</th><th>Membres</th><th>Occurrences</th></tr></thead>
+  <tbody>
+  {% for t in report.systemic_tensions %}
+  <tr>
+    <td><strong>{{ t.tension_type }}</strong></td>
+    <td>{{ t.axis }}</td>
+    <td>{{ t.involved | join(', ') }}</td>
+    <td>{{ t.count }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{# ── SYNTHÈSE GLOBALE ───────────────────────────────────────────────────── #}
+<div class="part-header"><h2>Synthèse de la lignée</h2></div>
+<div class="summary-block">{{ summary_text }}</div>
+
+{# ── FOOTER ─────────────────────────────────────────────────────────────── #}
+<div class="report-footer">
+  {{ title }} · Généré le {{ generated_at }} · Ligen Astralogie ·
+  Protocole ASTRO-SCRIPTEUR v3.0 · Swiss Ephemeris · Campanus
+</div>
+
+</body>
+</html>
