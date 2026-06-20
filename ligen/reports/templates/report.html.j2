@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="{{ config.language }}">
+<head>
+<meta charset="UTF-8"/>
+<title>{{ config.report_title }} — {{ config.subject_name }}</title>
+<style>
+/* ── Reset & base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+@page {
+  size: A4;
+  margin: 22mm 18mm 22mm 22mm;
+  @bottom-center {
+    content: "Ligen Astralogie · " counter(page) " / " counter(pages);
+    font-family: 'Georgia', serif;
+    font-size: 8pt;
+    color: #888;
+  }
+}
+@page :first { @bottom-center { content: none; } }
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 10.5pt;
+  line-height: 1.6;
+  color: #1a1a2e;
+  background: #ffffff;
+}
+
+/* ── Typographie ──────────────────────────────────────────────────────── */
+h1 { font-size: 22pt; font-weight: bold; letter-spacing: 0.02em; }
+h2 { font-size: 14pt; font-weight: bold; margin-top: 1.4em; margin-bottom: 0.4em; }
+h3 { font-size: 11.5pt; font-weight: bold; margin-top: 1em; margin-bottom: 0.3em; }
+p  { margin-bottom: 0.7em; }
+
+/* ── Palette ──────────────────────────────────────────────────────────── */
+:root {
+  --gold:    #b8922a;
+  --gold-lt: #d4a83a;
+  --dark:    #0d0d1a;
+  --mid:     #2a2a4a;
+  --light:   #f5f3ee;
+  --border:  #d0cbb8;
+}
+
+/* ── Page de garde ────────────────────────────────────────────────────── */
+.cover {
+  page-break-after: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 240mm;
+  background: var(--dark);
+  color: #f0ede6;
+  border-radius: 4px;
+  padding: 40pt 30pt;
+  text-align: center;
+}
+.cover-brand {
+  font-size: 11pt;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  margin-bottom: 24pt;
+  font-family: 'Georgia', serif;
+}
+.cover-title {
+  font-size: 26pt;
+  font-weight: bold;
+  color: #f0ede6;
+  margin-bottom: 8pt;
+  letter-spacing: 0.01em;
+}
+.cover-subtitle {
+  font-size: 14pt;
+  color: var(--gold);
+  margin-bottom: 30pt;
+}
+.cover-divider {
+  width: 60pt;
+  height: 1pt;
+  background: var(--gold);
+  margin: 14pt auto;
+}
+.cover-meta {
+  font-size: 10pt;
+  color: #aaa;
+  line-height: 2;
+  font-family: 'Georgia', serif;
+}
+.cover-meta strong { color: #ddd; }
+.cover-footer {
+  margin-top: 32pt;
+  font-size: 8pt;
+  color: #666;
+  letter-spacing: 0.08em;
+}
+
+/* ── Roue natale ──────────────────────────────────────────────────────── */
+.wheel-container {
+  text-align: center;
+  margin: 16pt 0 24pt 0;
+  page-break-inside: avoid;
+}
+.wheel-container img {
+  max-width: 100%;
+  width: 420pt;
+  height: auto;
+  border-radius: 3px;
+}
+.wheel-caption {
+  font-size: 8.5pt;
+  color: #888;
+  margin-top: 6pt;
+  font-style: italic;
+}
+
+/* ── Tableaux ─────────────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10pt 0 14pt 0;
+  font-size: 9.5pt;
+  page-break-inside: avoid;
+}
+thead tr {
+  background: var(--mid);
+  color: #f0ede6;
+}
+thead th {
+  padding: 5pt 7pt;
+  text-align: left;
+  font-weight: bold;
+  font-size: 9pt;
+  letter-spacing: 0.04em;
+}
+tbody tr:nth-child(even) { background: var(--light); }
+tbody tr:nth-child(odd)  { background: #ffffff; }
+tbody td {
+  padding: 4pt 7pt;
+  border-bottom: 0.5pt solid var(--border);
+  vertical-align: middle;
+}
+.retro { color: var(--gold); font-weight: bold; }
+.asp-trine   { color: #2a6fa8; }
+.asp-sext    { color: #3a7a30; }
+.asp-square  { color: #b04020; }
+.asp-opp     { color: #8a6020; }
+.asp-conj    { color: #333; }
+
+/* ── Sections de blocs ────────────────────────────────────────────────── */
+.section {
+  margin: 0 0 20pt 0;
+  page-break-inside: avoid;
+}
+.section-header {
+  background: var(--mid);
+  color: #f0ede6;
+  padding: 5pt 10pt;
+  border-left: 4pt solid var(--gold);
+  margin-bottom: 8pt;
+  border-radius: 0 3px 3px 0;
+}
+.section-header .block-id {
+  font-size: 7.5pt;
+  color: var(--gold-lt);
+  letter-spacing: 0.12em;
+  font-family: monospace;
+}
+.section-header h2 {
+  font-size: 12pt;
+  margin: 2pt 0 0 0;
+  color: #f0ede6;
+}
+.section-body {
+  padding: 0 4pt;
+  font-size: 10pt;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  color: #1a1a2e;
+}
+.section-error {
+  background: #fff0f0;
+  border-left: 3pt solid #cc4444;
+  padding: 8pt 10pt;
+  font-size: 9pt;
+  color: #880000;
+  font-family: monospace;
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── Titres de partie ─────────────────────────────────────────────────── */
+.part-header {
+  page-break-before: always;
+  border-bottom: 1.5pt solid var(--gold);
+  margin-bottom: 18pt;
+  padding-bottom: 6pt;
+}
+.part-header h2 {
+  font-size: 16pt;
+  color: var(--mid);
+  margin-top: 0;
+}
+
+/* ── Encadrés ─────────────────────────────────────────────────────────── */
+.callout {
+  background: var(--light);
+  border-left: 3pt solid var(--gold);
+  padding: 8pt 12pt;
+  margin: 10pt 0;
+  font-size: 10pt;
+  border-radius: 0 3px 3px 0;
+  page-break-inside: avoid;
+}
+.callout strong { color: var(--mid); }
+
+/* ── Pied de page ─────────────────────────────────────────────────────── */
+.report-footer {
+  margin-top: 30pt;
+  padding-top: 8pt;
+  border-top: 0.5pt solid var(--border);
+  font-size: 8pt;
+  color: #999;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+{# ── PAGE DE GARDE ──────────────────────────────────────────────────────── #}
+<div class="cover">
+  <div class="cover-brand">Ligen Astralogie</div>
+  <div class="cover-title">{{ config.report_title }}</div>
+  <div class="cover-subtitle">{{ config.subject_name }}</div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <strong>Naissance :</strong> {{ config.birth_date }} · {{ config.birth_time }}<br/>
+    <strong>Lieu :</strong> {{ config.birth_place }}<br/>
+    <strong>ASC :</strong> {{ asc_sign }} {{ asc_deg }} ·
+    <strong>MC :</strong> {{ mc_sign }} {{ mc_deg }}<br/>
+    <strong>Domification :</strong> Campanus · Tropicale<br/>
+    <strong>Blocs actifs :</strong> {{ config.active_blocks | join(', ') }}
+  </div>
+  <div class="cover-divider"></div>
+  <div class="cover-footer">
+    Généré le {{ generated_at }} · {{ config.author }} · Protocole ASTRO-SCRIPTEUR v3.0
+  </div>
+</div>
+
+{# ── ROUE NATALE ────────────────────────────────────────────────────────── #}
+{% if wheel_uri %}
+<div class="part-header">
+  <h2>Thème natal — Roue Campanus</h2>
+</div>
+<div class="wheel-container">
+  <img src="{{ wheel_uri }}" alt="Roue natale {{ config.subject_name }}" />
+  <div class="wheel-caption">
+    Domification Campanus · Astrologie Tropicale ·
+    {{ config.birth_date }} {{ config.birth_time }} · {{ config.birth_place }}
+  </div>
+</div>
+{% endif %}
+
+{# ── CARTOGRAPHIE PLANÉTAIRE ────────────────────────────────────────────── #}
+<div class="part-header">
+  <h2>Cartographie planétaire</h2>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Planète</th><th>Signe</th><th>Degré</th><th>Maison</th><th>R</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in planets %}
+    <tr>
+      <td><strong>{{ row.name }}</strong></td>
+      <td>{{ row.sign }}</td>
+      <td>{{ row.degree }}</td>
+      <td>{{ row.house }}</td>
+      <td class="retro">{{ row.retrograde }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ── MAISONS CAMPANUS ───────────────────────────────────────────────────── #}
+<h3>Maisons Campanus</h3>
+<table>
+  <thead>
+    <tr><th>Maison</th><th>Cuspide</th><th>Degré</th><th>Planètes</th></tr>
+  </thead>
+  <tbody>
+    {% for row in houses %}
+    <tr>
+      <td><strong>M{{ row.number }}</strong></td>
+      <td>{{ row.sign }}</td>
+      <td>{{ row.degree }}</td>
+      <td>{{ row.planets }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ── ASPECTS MAJEURS ────────────────────────────────────────────────────── #}
+<div class="part-header">
+  <h2>Aspects majeurs (triés par orbe)</h2>
+</div>
+<table>
+  <thead>
+    <tr><th>Planète A</th><th>Planète B</th><th>Aspect</th><th>Orbe</th><th>Dir.</th></tr>
+  </thead>
+  <tbody>
+    {% for row in aspects %}
+    <tr>
+      <td>{{ row.planet_a }}</td>
+      <td>{{ row.planet_b }}</td>
+      <td class="
+        {% if row.aspect == 'Trigone' %}asp-trine
+        {% elif row.aspect == 'Sextile' %}asp-sext
+        {% elif row.aspect == 'Carré' %}asp-square
+        {% elif row.aspect == 'Opposition' %}asp-opp
+        {% else %}asp-conj{% endif %}
+      "><strong>{{ row.aspect }}</strong></td>
+      <td>{{ row.orb }}</td>
+      <td>{{ row.applying }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{# ── SECTIONS BLOCS ─────────────────────────────────────────────────────── #}
+{% if sections %}
+<div class="part-header">
+  <h2>Analyse — Blocs actifs</h2>
+</div>
+
+{% for sec in sections %}
+<div class="section">
+  <div class="section-header">
+    <div class="block-id">{{ sec.block_id }}</div>
+    <h2>{{ sec.title }}</h2>
+  </div>
+  {% if sec.is_error %}
+    <div class="section-error">⚠ {{ sec.error_msg }}</div>
+  {% else %}
+    <div class="section-body">
+      {%- set lines = sec.content.split('\n') -%}
+      {%- set filtered = [] -%}
+      {%- for line in lines -%}
+        {%- if not line.startswith('#') -%}
+          {%- set _ = filtered.append(line) -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {{ filtered | join('\n') }}
+    </div>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+{# ── PIED DE PAGE ───────────────────────────────────────────────────────── #}
+<div class="report-footer">
+  {{ config.report_title }} · {{ config.subject_name }} ·
+  Généré le {{ generated_at }} · {{ config.author }} ·
+  Protocole ASTRO-SCRIPTEUR v3.0 · Swiss Ephemeris · Campanus
+</div>
+
+</body>
+</html>
