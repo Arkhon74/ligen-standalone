@@ -1,0 +1,16 @@
+# Ligen Astralogie — dépendances développement uniquement
+# Inclure requirements.txt en base : pip install -r requirements.txt -r requirements-dev.txt
+
+-r requirements.txt
+
+# ── Tests ─────────────────────────────────────────────────────────────────────
+pytest==9.0.3
+pytest-cov==6.1.0
+pytest-flask==1.3.0
+
+# ── Qualité code ──────────────────────────────────────────────────────────────
+ruff==0.11.13
+mypy==1.15.0
+
+# ── Utilitaires dev ───────────────────────────────────────────────────────────
+python-dotenv==1.0.1

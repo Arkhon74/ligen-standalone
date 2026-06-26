@@ -77,6 +77,47 @@ _configs = {
 
 # ── Factory ───────────────────────────────────────────────────────────────────
 
+def _validate_config(app: Flask) -> None:
+    """
+    Valide la configuration au démarrage.
+    Lève RuntimeError si un paramètre critique est manquant ou invalide.
+    """
+    import os
+    warnings_list = []
+
+    ephe = app.config.get("EPHE_PATH", "")
+    if not ephe or not os.path.isdir(ephe):
+        warnings_list.append(
+            f"LIGEN_EPHE_PATH='{ephe}' inaccessible — "
+            "calculs Swiss Ephemeris limités aux éphémérides intégrées"
+        )
+
+    prompts = app.config.get("PROMPTS_DIR", "")
+    if prompts and not os.path.isdir(prompts):
+        warnings_list.append(
+            f"LIGEN_PROMPTS_DIR='{prompts}' introuvable — "
+            "loader de blocs prompts non fonctionnel"
+        )
+
+    templates = app.config.get("TEMPLATES_DIR", "")
+    if templates and not os.path.isdir(templates):
+        raise RuntimeError(
+            f"LIGEN_TEMPLATES_DIR='{templates}' introuvable — "
+            "génération de rapports impossible. "
+            "Vérifiez le chemin dans .env"
+        )
+
+    key = app.config.get("SECRET_KEY", "")
+    if key == "ligen-dev-secret-key" and not app.config.get("TESTING"):
+        warnings_list.append(
+            "LIGEN_SECRET_KEY utilise la valeur par défaut — "
+            "définir une clé unique en production"
+        )
+
+    for w in warnings_list:
+        app.logger.warning("[config] %s", w)
+
+
 def create_app(config_name: str | None = None) -> Flask:
     """
     Factory Flask.
@@ -110,6 +151,9 @@ def create_app(config_name: str | None = None) -> Flask:
     reports_dir = Path(app.config["REPORTS_DIR"])
     reports_dir.mkdir(parents=True, exist_ok=True)
     app.config["REPORTS_DIR"] = str(reports_dir.resolve())
+
+    # ── Validation config au démarrage ───────────────────────────────────────
+    _validate_config(app)
 
     # ── Blueprints ────────────────────────────────────────────────────────────
     from ligen.api.routes.charts   import charts_bp

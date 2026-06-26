@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=72.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "ligen"
+version = "1.0.0"
+description = "Ligen Astralogie — moteur de calcul astrologique et générateur de rapports"
+authors = [{ name = "Fred Troussier", email = "troussier.frederic@live.fr" }]
+license = { text = "Proprietary" }
+readme = "README.md"
+requires-python = ">=3.11"
+
+keywords = ["astrologie", "ephemeris", "swisseph", "campanus", "pdf", "flask"]
+
+dependencies = [
+    "flask>=3.1.3",
+    "gunicorn>=23.0.0",
+    "pyswisseph>=2.10.3.2",
+    "weasyprint>=69.0",
+    "jinja2>=3.1.6",
+    "svgwrite>=1.4.3",
+    "cairosvg>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=6.1.0",
+    "pytest-flask>=1.3.0",
+    "ruff>=0.11.13",
+    "mypy>=1.15.0",
+    "python-dotenv>=1.0.1",
+]
+
+[project.scripts]
+# Point d'entrée CLI (M7b — à implémenter)
+ligen = "ligen.cli:main"
+
+[project.urls]
+Repository = "https://github.com/Arkhon74/ligen-standalone"
+
+# ── Setuptools ────────────────────────────────────────────────────────────────
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ligen*"]
+exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+"ligen.prompts.blocks"   = ["*.md"]
+"ligen.reports.templates" = ["*.j2", "*.html"]
+
+# ── Pytest ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths   = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+# ── Ruff (linter) ─────────────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py311"
+line-length    = 100
+src            = ["."]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B"]
+ignore = [
+    "E501",   # line too long — géré au cas par cas
+    "B008",   # function call in default arg — courant en Flask
+    "N803",   # arg name should be lowercase — dataclass fields
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ligen"]
+
+# ── Mypy ──────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version         = "3.11"
+warn_return_any        = true
+warn_unused_configs    = true
+ignore_missing_imports = true
