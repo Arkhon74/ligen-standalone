@@ -1,6 +1,6 @@
 """
 ligen/cli/cli.py
-Ligen Astralogie — Interface en ligne de commande
+Ligen Astrologie — Interface en ligne de commande
 
 Entry point : ligen (défini dans pyproject.toml)
 Framework   : Click 8
@@ -15,9 +15,9 @@ Commandes
 
   ligen session create    — Créer une session
   ligen session list      — Lister les sessions
-  ligen session add-block — Activer un bloc (A01–C06)
-  ligen session close     — Fermer une session
-  ligen session show      — Afficher une session
+    ligen session show       — Afficher une session
+  ligen session add-block  — Activer un bloc (A01–C06)
+  ligen session close      — Fermer une session
 
   ligen report natal    — Générer un rapport PDF natal
   ligen report lineage  — Générer un rapport PDF de lignée
@@ -26,7 +26,7 @@ Commandes
   ligen db info  — Statistiques de la base
   ligen db reset — Réinitialiser (avec confirmation)
 
-  ligen audit    — Audit de l'environnement (éphémérides, blocs, templates)
+  ligen audit    — Vérifie les 26 blocs, éphémérides et templates
 """
 
 from __future__ import annotations
@@ -111,7 +111,7 @@ pass_ctx = click.make_pass_decorator(LigenContext)
 @click.group()
 @click.option("--db",       envvar="LIGEN_DB_PATH",       default="ligen.db",
               show_default=True, help="Chemin SQLite")
-@click.option("--ephe",     envvar="LIGEN_EPHE_PATH",     default="/home/user/ephe",
+@click.option("--ephe",     envvar="LIGEN_EPHE_PATH",     default=os.path.expanduser("~/ephe"),
               show_default=True, help="Dossier éphémérides Swiss Ephemeris")
 @click.option("--reports",  envvar="LIGEN_REPORTS_DIR",   default="reports",
               show_default=True, help="Dossier de sortie PDF")
@@ -122,7 +122,7 @@ pass_ctx = click.make_pass_decorator(LigenContext)
 @click.version_option("1.0.0", prog_name="ligen")
 @click.pass_context
 def cli(ctx, db, ephe, reports, prompts, templates):
-    """Ligen Astralogie — moteur de calcul et générateur de rapports."""
+    """Ligen Astrologie — moteur de calcul et générateur de rapports."""
     ctx.ensure_object(dict)
     ctx.obj = LigenContext(
         db_path=db,
@@ -456,7 +456,7 @@ def session_add_block(ctx, session_id, block_id, rendered):
 @click.argument("session_id", type=int)
 @pass_ctx
 def session_close(ctx, session_id):
-    """Ferme une session (A13)."""
+    """Ferme une session en cours et persiste son état."""
     repo = ctx.session_repo()
     rec  = repo.get_by_id(session_id)
     if not rec:
@@ -482,7 +482,7 @@ def report():
 @click.option("--chart-id",     required=True, type=int,  help="ID du thème natal")
 @click.option("--output", "-o", default=None,             help="Chemin PDF de sortie")
 @click.option("--blocks",       default="A01,A02,A03",    show_default=True,
-              help="Blocs actifs séparés par virgule")
+              help="Blocs actifs séparés par virgule (ex: A01,A02,A03). Défaut : A01 (profil natal), A02 (inter-générations), A03 (patterns familiaux)")
 @click.option("--birth-place",  default="")
 @click.option("--birth-date",   default="")
 @click.option("--birth-time",   default="")
@@ -728,7 +728,7 @@ def db_reset(ctx):
 @cli.command()
 @pass_ctx
 def audit(ctx):
-    """Vérifie l'environnement Ligen (éphémérides, blocs, templates)."""
+    """Vérifie la présence des 26 blocs d'interprétation standards (A01–A14, B01–B06, C01–C06) et signale les éléments manquants. Contrôle aussi les éphémérides et les templates."""
     import os
     _header("Audit environnement Ligen")
 
