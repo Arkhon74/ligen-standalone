@@ -9,15 +9,24 @@
 
 ```
 Frontend (React/Vite)     → Vercel (statique)
-Backend (Flask/Python)    → À déployer (Railway / Render / VPS)
+Backend (Flask/Python)    → Render (Docker, render.yaml)
 CLI (Click)               → Local / Docker
 ```
+
+## URLs de production
+
+| Couche | URL |
+|--------|-----|
+| Frontend Vercel | https://ligen-astralogie.vercel.app |
+| Frontend pplx.app | https://ligen-astralogie.pplx.app |
+| Backend Render (cible) | https://ligen-astralogie-api.onrender.com |
+| Backend healthcheck | https://ligen-astralogie-api.onrender.com/health |
 
 ## Variables d'environnement Vercel
 
 | Variable | Valeur | Description |
 |----------|--------|-------------|
-| `VITE_API_URL` | `https://api.ligen.app` | URL du backend Flask (à configurer) |
+| `VITE_API_URL` | `https://ligen-astralogie-api.onrender.com` | URL du backend Flask Render (configuré sur Vercel le 19 juil. 2026) |
 
 ## Déploiement
 
@@ -39,5 +48,13 @@ npx vercel deploy --prod --yes --token $VERCEL_TOKEN
 
 ## Prochaine étape
 
-Déployer le backend Flask (`ligen/api/`) sur Railway ou Render,
-puis configurer `VITE_API_URL` dans les variables Vercel.
+Backend Flask prêt pour Render (commit `48d50fe`) :
+- `render.yaml` à la racine du dépôt (Docker + disque persistant `/data`)
+- CORS configuré pour le frontend Vercel/pplx.app
+- `VITE_API_URL` ajouté sur Vercel production
+
+Action restante côté dashboard Render :
+1. New → Blueprint → connecter `Arkhon74/ligen-standalone`
+2. Render détecte `render.yaml` et crée `ligen-astralogie-api`
+3. Plan Starter (7$/mois) requis pour le disque persistant SQLite ; Free = DB éphémère
+4. Une fois déployé, vérifier `GET /health` puis redéployer le frontend Vercel pour propager `VITE_API_URL`
