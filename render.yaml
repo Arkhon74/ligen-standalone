@@ -1,0 +1,55 @@
+# ── Ligen Astralogie — Render Blueprint ────────────────────────────────────────
+# Déploiement backend Flask + Swiss Ephemeris via Dockerfile M7.
+#
+# Prérequis :
+#   - Render connecté au compte GitHub Arkhon74/ligen-standalone
+#   - Plan "Starter" (7$/mois) requis pour le disque persistant SQLite.
+#     Le plan Free n'a pas de disque persistant → la base SQLite est éphémère
+#     (perdue à chaque redéploiement). Acceptable pour test, pas pour prod.
+#
+# Après déploiement :
+#   - URL publique : https://ligen-astralogie-api.onrender.com
+#   - Healthcheck   : GET /health
+#   - Connecter le frontend Vercel : VITE_API_URL=<url ci-dessus>
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: ligen-astralogie-api
+    runtime: docker
+    plan: starter              # starter = disque persistant ; free = éphémère
+    region: frankfurt          # EU, proche de Genève
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: LIGEN_SECRET_KEY
+        generateValue: true    # Render génère une clé aléatoire
+      - key: LIGEN_DB_PATH
+        value: /data/db/ligen.db
+      - key: LIGEN_EPHE_PATH
+        value: /ephe
+      - key: SE_EPHE_PATH
+        value: /ephe
+      - key: LIGEN_REPORTS_DIR
+        value: /data/reports
+      - key: LIGEN_PROMPTS_DIR
+        value: /app/ligen/prompts/blocks
+      - key: LIGEN_TEMPLATES_DIR
+        value: /app/ligen/reports/templates
+      - key: LIGEN_CORS_ORIGINS
+        value: https://ligen-astralogie.vercel.app,https://ligen-astralogie.pplx.app
+      - key: GUNICORN_WORKERS
+        value: "2"
+      - key: GUNICORN_TIMEOUT
+        value: "120"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    # Disque persistant SQLite + rapports (plan Starter uniquement)
+    disk:
+      name: ligen-data
+      mountPath: /data
+      sizeGB: 1                # 1 Go — amplement pour SQLite + PDF

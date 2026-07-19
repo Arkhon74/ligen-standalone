@@ -88,14 +88,9 @@ EXPOSE 5000
 
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD python3 -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')" \
+    CMD python3 -c "import os,urllib.request; urllib.request.urlopen(f'http://localhost:{os.environ.get(\"PORT\",\"5000\")}/health')" \
     || exit 1
 
-# Démarrage gunicorn
-CMD ["gunicorn", \
-     "--bind", "0.0.0.0:5000", \
-     "--workers", "2", \
-     "--timeout", "120", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-", \
-     "ligen.api.app:create_app()"]
+# Démarrage gunicorn (port dynamique pour Render / Railway / conteneurs)
+# Render injecte PORT ; défaut 5000 pour local / Docker standard.
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${GUNICORN_WORKERS:-2} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - 'ligen.api.app:create_app()'"]

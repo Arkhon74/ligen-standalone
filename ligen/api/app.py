@@ -28,6 +28,7 @@ import logging
 from pathlib import Path
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 try:
     from ligen.data.db import Database
@@ -135,6 +136,14 @@ def create_app(config_name: str | None = None) -> Flask:
 
     app = Flask(__name__)
     app.config.from_object(cfg)
+
+    # ── CORS (frontend séparé : Vercel, pplx.app, local) ──────────────────────
+    cors_origins = os.environ.get(
+        "LIGEN_CORS_ORIGINS",
+        "https://ligen-astralogie.vercel.app,https://ligen-astralogie.pplx.app,http://localhost:5173,http://localhost:3000",
+    )
+    origins = [o.strip() for o in cors_origins.split(",") if o.strip()]
+    CORS(app, origins=origins, supports_credentials=False)
 
     # ── Logging ───────────────────────────────────────────────────────────────
     logging.basicConfig(
