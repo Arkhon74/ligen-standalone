@@ -29,6 +29,7 @@ from pathlib import Path
 
 from flask import Flask, jsonify
 from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 try:
     from ligen.data.db import Database
@@ -136,6 +137,12 @@ def create_app(config_name: str | None = None) -> Flask:
 
     app = Flask(__name__)
     app.config.from_object(cfg)
+
+    # ── Proxy inverse (Render/Cloudflare) ──────────────────────────────────────
+    # Sans ça, Flask ignore X-Forwarded-Proto et génère des redirections
+    # (ex : trailing slash) en http:// au lieu de https:// -> contenu mixte
+    # bloqué par le navigateur depuis le frontend Vercel en HTTPS.
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 
     # ── CORS (frontend séparé : Vercel, pplx.app, local) ──────────────────────
     cors_origins = os.environ.get(
