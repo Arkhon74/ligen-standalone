@@ -71,7 +71,7 @@ RUN mkdir -p /data/reports /data/db
 # Utilisateur non-root
 RUN useradd -r -u 1001 -m ligen && \
     chown -R ligen:ligen /app /data /ephe
-USER ligen
+
 
 # Variables d'environnement par défaut
 ENV FLASK_ENV=production \
@@ -93,4 +93,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
 
 # Démarrage gunicorn (port dynamique pour Render / Railway / conteneurs)
 # Render injecte PORT ; défaut 5000 pour local / Docker standard.
-CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${GUNICORN_WORKERS:-2} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - 'ligen.api.app:create_app()'"]
+CMD ["sh", "-c", "mkdir -p /data/db /data/reports && gunicorn --bind 0.0.0.0:${PORT:-5000} --workers ${GUNICORN_WORKERS:-2} --timeout ${GUNICORN_TIMEOUT:-120} --access-logfile - --error-logfile - 'ligen.api.app:create_app()'"]
